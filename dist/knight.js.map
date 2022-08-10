@@ -1,1 +1,1 @@
-{"version":3,"file":"knight.js","sourceRoot":"","sources":["../scripts/knight.ts"],"names":[],"mappings":""}
+{"version":3,"file":"knight.js","sourceRoot":"","sources":["../scripts/knight.ts"],"names":[],"mappings":";;;;;AAAA,4DAAoC;AAEpC,MAAM,MAAM;IAAZ;QAEI,UAAK,GAAG,IAAI,mBAAS,EAAE,CAAC;IAK5B,CAAC;IAHG,WAAW,CAAC,KAAuB,EAAE,GAAqB;QACtD,MAAM,GAAG,GAAuB,EAAE,CAAA;IACtC,CAAC;CACJ"}
