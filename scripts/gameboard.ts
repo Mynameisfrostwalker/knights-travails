@@ -94,18 +94,28 @@ class Gameboard {
 
     move(start: [number, number], x: number, y: number) {
         const newCoords: [number, number] = [start[0] + x, start[1] + y];
-        console.log(newCoords)
-        const newCell = this.board.find((value) => {
+        if (this.board.find((value) => {
             if (
-                value.coord[0] === newCoords[0] &&
-                value.coord[1] === newCoords[1]
+                value.coord[0] === start[0] &&
+                value.coord[1] === start[1]
             ) {
                 return true
             }
             return false
-        });
+        })) {
+            const newCell = this.board.find((value) => {
+                if (
+                    value.coord[0] === newCoords[0] &&
+                    value.coord[1] === newCoords[1]
+                ) {
+                    return true
+                }
+                return false
+            });
 
-        return newCell || null
+            return newCell || null
+        } 
+        return null
     }
 }
 

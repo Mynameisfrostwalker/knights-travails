@@ -17,15 +17,23 @@ class Gameboard {
     }
     move(start, x, y) {
         const newCoords = [start[0] + x, start[1] + y];
-        console.log(newCoords);
-        const newCell = this.board.find((value) => {
-            if (value.coord[0] === newCoords[0] &&
-                value.coord[1] === newCoords[1]) {
+        if (this.board.find((value) => {
+            if (value.coord[0] === start[0] &&
+                value.coord[1] === start[1]) {
                 return true;
             }
             return false;
-        });
-        return newCell || null;
+        })) {
+            const newCell = this.board.find((value) => {
+                if (value.coord[0] === newCoords[0] &&
+                    value.coord[1] === newCoords[1]) {
+                    return true;
+                }
+                return false;
+            });
+            return newCell || null;
+        }
+        return null;
     }
 }
 _Gameboard_instances = new WeakSet(), _Gameboard_makeOneArrRow = function _Gameboard_makeOneArrRow(num, side) {
