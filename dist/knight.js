@@ -7,81 +7,66 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var _Knight_instances, _Knight_knightSteps, _Knight_knightMoves;
+var _Knight_instances, _Knight_isKey, _Knight_knightMoves;
 Object.defineProperty(exports, "__esModule", { value: true });
+const cell_1 = __importDefault(require("./cell"));
 const gameboard_1 = __importDefault(require("./gameboard"));
 class Knight {
-    constructor() {
+    constructor(side = 8) {
         _Knight_instances.add(this);
-        this.board = new gameboard_1.default(5);
-        _Knight_knightSteps.set(this, [
-            [1, 2],
-            [2, 1],
-            [-1, 2],
-            [-2, 1],
-            [1, -2],
-            [2, -1],
-            [-1, -2],
-            [-2, -1]
-        ]);
+        this.board = new gameboard_1.default(side);
     }
     knightMoves(start, end) {
-        return __classPrivateFieldGet(this, _Knight_instances, "m", _Knight_knightMoves).call(this, start, end, []);
+        const path = __classPrivateFieldGet(this, _Knight_instances, "m", _Knight_knightMoves).call(this, start, end);
+        if (path) {
+            console.log(`=> You made it in ${path.length - 1} moves! Here's your path: \n`);
+            path.forEach((value) => {
+                console.log(`[${value}] \n`);
+            });
+        }
+        return path;
     }
 }
-_Knight_knightSteps = new WeakMap(), _Knight_instances = new WeakSet(), _Knight_knightMoves = function _Knight_knightMoves(start, end, arr) {
-    const copy = [...arr];
-    copy.push(start);
-    const valArr = [];
-    //console.log(arr)
-    for (let i = 0; i < __classPrivateFieldGet(this, _Knight_knightSteps, "f").length; i += 1) {
-        const next = this.board.move(start, __classPrivateFieldGet(this, _Knight_knightSteps, "f")[i][0], __classPrivateFieldGet(this, _Knight_knightSteps, "f")[i][1]);
-        if (next) {
-            if (!copy.find((value) => {
-                if (next.coord[0] === value[0] &&
-                    next.coord[1] === value[1]) {
-                    return true;
-                }
-                return false;
-            })) {
-                if (next.coord[0] === end[0] &&
-                    next.coord[1] === end[1]) {
-                    copy.push(next.coord);
-                    return copy;
-                }
-                const val = __classPrivateFieldGet(this, _Knight_instances, "m", _Knight_knightMoves).call(this, next.coord, end, copy);
-                if (val) {
-                    valArr.push([...val]);
-                }
-                else {
-                    valArr.push([null]);
-                }
-            }
-            else {
-                valArr.push([null]);
-            }
-            /*
-            if (next.coord[0] === 5 && next.coord[1] === 4) {
-                console.log(i);
-                console.log(start)
-                console.log(next.coord, "next")
-                console.log(arr)
-            }
-            */
-        }
+_Knight_instances = new WeakSet(), _Knight_isKey = function _Knight_isKey(key, obj) {
+    if (key !== "coord" && key in obj) {
+        return true;
     }
-    let shortest = valArr[0];
-    for (let i = 0; i < valArr.length; i += 1) {
-        if (shortest[0] === null) {
-            shortest = valArr[i];
-        }
-        if (valArr[i].length < shortest.length) {
-            if (valArr[i][0] !== null) {
-                shortest = valArr[i];
+    return false;
+}, _Knight_knightMoves = function _Knight_knightMoves(start, end) {
+    const startCell = this.board.find(start);
+    let endCell = null;
+    if (startCell) {
+        const queue = [[startCell, []]];
+        const visited = [];
+        for (let i = 0; i < queue.length; i += 1) {
+            const value = queue[i];
+            if (!endCell) {
+                if (!visited.includes(value[0])) {
+                    if (value[0].coord[0] === end[0] &&
+                        value[0].coord[1] === end[1]) {
+                        endCell = [...value[1], value[0].coord];
+                    }
+                    else {
+                        const keys = Object.keys(value[0]);
+                        keys.forEach((key) => {
+                            if (__classPrivateFieldGet(this, _Knight_instances, "m", _Knight_isKey).call(this, key, value[0])) {
+                                const cell = value[0][key];
+                                if (cell instanceof cell_1.default) {
+                                    queue.push([cell, [...value[1], value[0].coord]]);
+                                }
+                            }
+                        });
+                        visited.push(value[0]);
+                        queue.shift();
+                    }
+                }
             }
         }
     }
-    return shortest;
+    else {
+        return null;
+    }
+    return endCell;
 };
-console.log(new Knight().knightMoves([2, 3], [2, 2]));
+console.dir(new Knight().knightMoves([0, 0], [7, 7]), { depth: 1 });
 //# sourceMappingURL=knight.js.map

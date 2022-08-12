@@ -1,90 +1,77 @@
+import Cell from "./cell";
 import Gameboard from "./gameboard";
 
 class Knight {
 
-    board = new Gameboard(5);
+    board: Gameboard;
 
-    #knightSteps = [
-        [1, 2],
-        [2, 1],
-        [-1, 2],
-        [-2, 1],
-        [1, -2],
-        [2, -1],
-        [-1, -2],
-        [-2, -1]
-    ]
+    constructor(side = 8) {
+        this.board = new Gameboard(side);
+    }
 
-    #knightMoves(
-        start: [number, number],
-        end: [number, number],
-        arr: [number, number][]
-    ) {
-        const copy = [...arr];
-        copy.push(start);
-        const valArr: ([number, number] | null)[][] = [];
-        //console.log(arr)
-
-        for (let i = 0; i < this.#knightSteps.length; i += 1) {
-            const next = this.board.move(start, this.#knightSteps[i][0], this.#knightSteps[i][1]);
-            if (next) {
-                if (!copy.find((value) => {
-                    if (
-                        next.coord[0] === value[0] &&
-                        next.coord[1] === value[1]
-                    ) {
-                        return true
-                    }
-                    return false
-                })) {
-                    if (
-                        next.coord[0] === end[0] &&
-                        next.coord[1] === end[1]
-                    ) {
-                        copy.push(next.coord);
-                        return copy;
-                    }
-                    const val = this.#knightMoves(next.coord, end, copy);
-                    if (val) {
-                        valArr.push([...val]);
-                    } else {
-                        valArr.push([null]);
-                    }
-                } else {
-                    valArr.push([null]);
-                }
-                /*
-                if (next.coord[0] === 5 && next.coord[1] === 4) {
-                    console.log(i);
-                    console.log(start)
-                    console.log(next.coord, "next")
-                    console.log(arr)
-                }
-                */
-            }
+    #isKey(key: string, obj: Cell): key is keyof Cell {
+        if (key !== "coord" && key in obj) {
+            return true
         }
 
-    
-        let shortest: ([number, number] | null)[] = valArr[0];
+        return false
+    }
 
-        for (let i = 0; i < valArr.length; i += 1) {
-            if (shortest[0] === null) {
-                shortest = valArr[i];
-            }
-            if (valArr[i].length < shortest.length) {
-                if (valArr[i][0] !== null ) {
-                    shortest = valArr[i];
+
+    #knightMoves(start: [number, number], end: [number, number]): [number, number][] | null {
+        const startCell = this.board.find(start);
+        let endCell: [number, number][] | null = null;
+
+        if (startCell) {
+            const queue: [Cell, [number, number][]][] = [[startCell, []]]
+            const visited: Cell[] = [];
+
+            for (let i = 0; i < queue.length; i += 1) {
+                const value = queue[i];
+                if (!endCell) {
+                    if (!visited.includes(value[0])) {
+                        if (
+                            value[0].coord[0] === end[0] &&
+                            value[0].coord[1] === end[1]
+                        ) {
+                            endCell = [...value[1], value[0].coord];
+                        } else {
+                            const keys = Object.keys(value[0]);
+                            keys.forEach((key) => {
+                                if (this.#isKey(key, value[0])) {
+                                    const cell = value[0][key];
+                                    if (cell instanceof Cell) {
+                                        queue.push([cell, [...value[1], value[0].coord]]);
+                                    }
+                                }
+                            })
+
+                            visited.push(value[0])
+                            queue.shift();
+                        }
+                    }
                 }
             }
+            
+        } else {
+            return null
         }
-        return shortest
+
+        return endCell;
     }
 
     
     knightMoves(start: [number, number], end: [number, number]) {
-        return this.#knightMoves(start, end, []);
+        const path = this.#knightMoves(start, end);
+        if (path) {
+            console.log(`=> You made it in ${path.length - 1} moves! Here's your path: \n`);
+            path.forEach((value) => {
+                console.log(`[${value}] \n`)
+            })
+        }
+        return path
     }
 
 }
 
-console.log(new Knight().knightMoves([2, 3], [2, 2]))
+console.dir(new Knight().knightMoves([0, 0], [7, 7]), {depth: 1})

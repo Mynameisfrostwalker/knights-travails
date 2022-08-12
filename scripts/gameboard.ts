@@ -1,10 +1,23 @@
 import Cell from "./cell";
 
+type Number = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+
 class Gameboard {
 
     board: Cell[];
 
-    constructor(side = 8) {
+    #knightSteps = [
+        [1, 2],
+        [2, 1],
+        [-1, 2],
+        [-2, 1],
+        [1, -2],
+        [2, -1],
+        [-1, -2],
+        [-2, -1]
+    ]
+
+    constructor(side: number) {
         this.board = this.#makeBoard(side)
     }
 
@@ -24,6 +37,10 @@ class Gameboard {
         return arr
     }
 
+    #checkNumber(num: number): num is Number {
+        return num >= 0 && num < 8
+    }
+
     #makeBoard(side: number) {
         const arr = this.#makeBoardArr(side);
         const boardArr: Cell[] = []
@@ -31,70 +48,33 @@ class Gameboard {
             boardArr[i] = new Cell(arr[i]);
         }
 
-        for (let i = 0; i < boardArr.length; i += 1) {
+        for (let i = 0; i < boardArr.length; i += 1) { 
 
-            const top = boardArr.find((value) => {
-                const coords = [...boardArr[i].coord];
-                coords[1] += 1;
-                if (
-                    value.coord[0] === coords[0] &&
-                    value.coord[1] === coords[1]
-                ) {
-                    return true;
+            for (let j = 0; j < this.#knightSteps.length; j += 1) { 
+                const move = boardArr.find((value) => {
+                    const coords = [...boardArr[i].coord];
+                    coords[0] += this.#knightSteps[j][0];
+                    coords[1] += this.#knightSteps[j][1];
+                    if (
+                        value.coord[0] === coords[0] &&
+                        value.coord[1] === coords[1]
+                    ) {
+                        return true;
+                    }
+                    return false;
+                })
+
+                if (this.#checkNumber(j)) {
+                    boardArr[i][`move${j}`] = move || null;
                 }
-                return false;
-            })
-            boardArr[i].top = top || null;
-
-            const bottom = boardArr.find((value) => {
-                const coords = [...boardArr[i].coord];
-                coords[1] -= 1;
-                if (
-                    value.coord[0] === coords[0] &&
-                    value.coord[1] === coords[1]
-                ) {
-                    return true
-                }
-                return false;
-            })
-            boardArr[i].bottom = bottom || null;
-
-            const right = boardArr.find((value) => {
-                const coords = [...boardArr[i].coord];
-                coords[0] += 1;
-                if (
-                    value.coord[0] === coords[0] &&
-                    value.coord[1] === coords[1]
-                ) {
-                    return true
-                }
-                return false;
-            })
-        
-            boardArr[i].right = right || null;
-
-            const left = boardArr.find((value) => {
-                const coords = [...boardArr[i].coord];
-                coords[0] -= 1;
-                if (
-                    value.coord[0] === coords[0] &&
-                    value.coord[1] === coords[1]
-                ) {
-                    return true
-                }
-                return false;
-            })
-            boardArr[i].left = left || null;
-
+            }
         }
 
         return boardArr;
-
     }
 
-    move(start: [number, number], x: number, y: number) {
-        const newCoords: [number, number] = [start[0] + x, start[1] + y];
-        if (this.board.find((value) => {
+    find(start: [number, number]) {
+        const cell = this.board.find((value) => {
             if (
                 value.coord[0] === start[0] &&
                 value.coord[1] === start[1]
@@ -102,21 +82,11 @@ class Gameboard {
                 return true
             }
             return false
-        })) {
-            const newCell = this.board.find((value) => {
-                if (
-                    value.coord[0] === newCoords[0] &&
-                    value.coord[1] === newCoords[1]
-                ) {
-                    return true
-                }
-                return false
-            });
+        })
 
-            return newCell || null
-        } 
-        return null
-    }
+        return cell || null
+    }        
+        
 }
 
 export default Gameboard;

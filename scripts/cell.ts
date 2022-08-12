@@ -3,14 +3,21 @@ class Cell {
 
     readonly coord;
 
-    top: Cell | null = null;
+    move0: Cell | null = null;
 
-    right: Cell | null = null;
+    move1: Cell | null = null;
 
-    bottom: Cell | null = null;
+    move2: Cell | null = null;
 
-    left: Cell | null = null;
+    move3: Cell | null = null;
 
+    move4: Cell | null = null;
+
+    move5: Cell | null = null;
+
+    move6: Cell | null = null;
+
+    move7: Cell | null = null;
 
     constructor(coord: [number, number]) {
         this.coord = coord;
